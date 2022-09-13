@@ -76,6 +76,13 @@ Reward distribution|Reward distribution|Reward distribution
 ```bash
 pip3 install -r requirements.txt
 ```
+* Note, this way maybe not work. On my server, I use:
+    1. download the mujoco210, unzip the file, and write down the PATH in the .bashrc
+    2. git down the mujoco-py source code, and `python setup.py install`
+    3. `pip install gym==0.17.3`
+    4. (maybe useful) `pip install opencv-python==4.3.0.38`, `pip install box2d box2d-kengz`
+    5. the other packages are not difficult to install, don't care about the edition
+
 ## Usage
 ### How to run
 ```bash
@@ -187,3 +194,14 @@ python3 main.py --mem_size=1000000 --env_name="Hopper-v3" --interval=100 --do_tr
 2. [@p-christ](https://github.com/p-christ) for [DIAYN.py](https://github.com/p-christ/Deep-Reinforcement-Learning-Algorithms-with-PyTorch/blob/master/agents/hierarchical_agents/DIAYN.py).
 3. [@johnlime](https://github.com/johnlime) for [RlkitExtension](https://github.com/johnlime/RlkitExtension).
 4. [@Dolokhow](https://github.com/Dolokhow) for [rl-algos-tf2 ](https://github.com/Dolokhow/rl-algos-tf2).
+
+
+## 本地训练试验（09.13）
+
+这个库完成还算可以，目前还没有与论文仔细比对，单从运行情况，是可以训练以及评估模型，并且可视化生成视频也没有问题。
+
+* 因为服务器没有外接显示器，所以需要虚拟运行（评估时），我们通过`xvfb`虚拟出一个图形界面，如果没有这个库，可以通过`apt-get install xvfb`安装
+
+`xvfb-run -s "-screen 0 1400x900x24" python3 main.py --mem_size=1000000 --env_name="MountainCarContinuous-v0" --interval=100 --n_skills=20`
+
+* 在评估时，由于`env.render(mode='rgb_array')`带有参数，目的是拿到图片，所以要注释掉 `libGLEW.so` , 而训练时`state = env.reset()`直接获取的状态空间向量，并不是图像像素。这个时候可以加上`libGLEW.so`。但目前还没有尝试过以图像作为输入的算法，设置细节可能还会有变化。

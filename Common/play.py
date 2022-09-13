@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 import os
 
-GlfwContext(offscreen=True)
+# GlfwContext(offscreen=True)
 
 
 class Play:
