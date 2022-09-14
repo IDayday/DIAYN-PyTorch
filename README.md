@@ -80,7 +80,7 @@ pip3 install -r requirements.txt
     1. download the mujoco210, unzip the file, and write down the PATH in the .bashrc
     2. git down the mujoco-py source code, and `python setup.py install`
     3. `pip install gym==0.17.3`
-    4. (maybe useful) `pip install opencv-python==4.3.0.38`, `pip install box2d box2d-kengz`
+    4. (maybe useful) `pip install opencv-python==4.3.0.38`, `pip install box2d box2d-kengz`, `apt-get install -y patchelf`
     5. the other packages are not difficult to install, don't care about the edition
 
 ## Usage
@@ -219,4 +219,10 @@ python3 main.py --mem_size=1000000 --env_name="Hopper-v3" --interval=100 --do_tr
   <img src="Results/Hopper/origin.png" width=300>
 </p>
 
-<img src="Results/Hopper/traning.png" width=300>
+通过分析20个skill的可视化视频，发现了非常有趣的现象（`origin`和`train`都存在）。一些skill在无监督的条件下，学会了 **前进** 、 **后退** 、**静态平衡** 、 **动态平衡** 、 **踮脚站立** 、 **前倾摔倒** 等等，这些都可能成为下游任务的技能，甚至是目标。初步实验，感觉DIAYN是个不错的算法，不过有点耗时。
+
+## 本地训练试验（09.14）
+
+原始仓库中未完成在`HalfCheetah-v3`环境上的实验，这里借此训练任务，顺带测试下两台服务器的训练速度。由于目前是单线程的训练模式，慢得接受不了，随后会进行多进程训练的改进。这里测试的两台GPU分别是`A100`和`V100`，其实都没有满载，显存占用也非常低。主要测试对比单核性能以及`pytorch1.8.0`与`pytorch1.8.1`以及`pytorch1.6.0`的效率（PS:因为曾用过一次1.8.1带来了不好的体验，然而这次显卡底层驱动只支持到CUDA10.1，别无选择，若1.8.1性能不及1.6.0，则可以回滚版本）
+
+跟踪服务器运行状态，V100服务器的CPU性能更好，给训练效率带来了一点点提升，但无关痛痒，所以问题还是单进程太慢。另外这台服务器上对比的`pytorch1.8.1`与`pytorch1.6.0`在速度上接近，1.8.1快一丢丢，但二者在CPU占用率和显存占用率上有差别，1.6.0CPU占用率更高，显存占用率低一点，GPU利用率二者相当。
