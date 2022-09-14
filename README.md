@@ -209,6 +209,7 @@ python3 main.py --mem_size=1000000 --env_name="Hopper-v3" --interval=100 --do_tr
 在Hopper-v3环境上使用内置参数，完整训练耗时15个半小时，以下是对比原始模型权重的评估结果
 
 * **train**
+
 <p align="center">
   <img src="Results/Hopper/traning.png" width=300>
 </p>
@@ -218,6 +219,4 @@ python3 main.py --mem_size=1000000 --env_name="Hopper-v3" --interval=100 --do_tr
   <img src="Results/Hopper/origin.png" width=300>
 </p>
 
-@import "Results/Hopper/origin.png" {width="300px"  title="origin" alt="我的 alt"}
-
-![origin](Results/Hopper/origin.png) 
+<img src="Results/Hopper/traning.png" width=300>
