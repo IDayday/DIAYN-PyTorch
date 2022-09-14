@@ -205,3 +205,19 @@ python3 main.py --mem_size=1000000 --env_name="Hopper-v3" --interval=100 --do_tr
 `xvfb-run -s "-screen 0 1400x900x24" python3 main.py --mem_size=1000000 --env_name="MountainCarContinuous-v0" --interval=100 --n_skills=20`
 
 * 在评估时，由于`env.render(mode='rgb_array')`带有参数，目的是拿到图片，所以要注释掉 `libGLEW.so` , 而训练时`state = env.reset()`直接获取的状态空间向量，并不是图像像素。这个时候可以加上`libGLEW.so`。但目前还没有尝试过以图像作为输入的算法，设置细节可能还会有变化。
+
+在Hopper-v3环境上使用内置参数，完整训练耗时15个半小时，以下是对比原始模型权重的评估结果
+
+* **train**
+<p align="center">
+  <img src="Results/Hopper/traning.png" width=300>
+</p>
+
+* **origin**
+<p align="center">
+  <img src="Results/Hopper/origin.png" width=300>
+</p>
+
+@import "Results/Hopper/origin.png" {width="300px"  title="origin" alt="我的 alt"}
+
+![origin](Results/Hopper/origin.png) 
