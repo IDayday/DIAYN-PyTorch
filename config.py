@@ -16,6 +16,7 @@ def get_config():
     parser.add_argument("--n_skills", default=20, type=int, help="The number of skills to learn.")
     parser.add_argument("--num_processes", default=10, type=int, help="The number of multiprocessing.")
     parser.add_argument("--reward_scale", default=1, type=float, help="The reward scaling factor introduced in SAC.")
+    parser.add_argument("--forward", default='CPU', type=str, help="forward on CPU or GPU when sampling")    
     parser.add_argument("--seed", default=123, type=int,
                         help="The randomness' seed for torch, numpy, random & gym[env].")
 

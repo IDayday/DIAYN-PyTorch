@@ -68,6 +68,11 @@ def learn(model_params, args, data_queue, signal_queue, simlog_queue, evalsignal
 
             if len(ag.memory) >= args["warmup_size"]:
                 signal_queue.put(1)
+                # use GPU if available
+                # if torch.cuda.is_available():
+                #     train_device = ag.set_policy_net_to_gpu_mode()
+                # else:
+                #     train_device = "cpu"
                 for epoch in range(1, step//args["num_processes"] + 1):
                     logq_zs = ag.train()
                     logq_zses.append(logq_zs)
@@ -82,6 +87,7 @@ def learn(model_params, args, data_queue, signal_queue, simlog_queue, evalsignal
                 update_model_params(model_params, updated_model_params)
                 # save weights
                 save_weights(model_dir, i_episode, ag, episode_reward_max, running_logq_z)
+                # _ = ag.set_policy_net_to_cpu_mode()
                 # expect for samples from new model params
                 while not data_queue.empty():
                     data_queue.get()

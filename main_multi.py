@@ -10,7 +10,7 @@ import torch.multiprocessing as mp
 from children_process import learn, simulation, evaluate
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+os.environ['CUDA_VISIBLE_DEVICES'] = '2'
 
 backup_file = ['./main_multi.py','./agent.py','./model.py','./children_process.py','./config.py']
 
@@ -25,9 +25,7 @@ def seed_everything(seed):
     torch.backends.cudnn.benchmark = True
     return
 
-def main():
-    # setting
-    configs = get_config()
+def main(configs):
     # get state or action shape from the env
     test_env = gym.make(configs["env_name"])
     n_states = test_env.observation_space.shape[0]
@@ -79,85 +77,14 @@ def main():
         p.join()
 
 
-
-
-
-
-    # env = gym.make(params["env_name"])
-
-
-    # agent = SACAgent(p_z=p_z, **params)
-    # logger = Logger(agent, **params)
-
-    # if params["do_train"]:
-
-    #     if not params["train_from_scratch"]:
-    #         episode, last_logq_zs, np_rng_state, *env_rng_states, torch_rng_state, random_rng_state = logger.load_weights()
-    #         agent.hard_update_target_network()
-    #         min_episode = episode
-    #         np.random.set_state(np_rng_state)
-    #         env.np_random.set_state(env_rng_states[0])
-    #         env.observation_space.np_random.set_state(env_rng_states[1])
-    #         env.action_space.np_random.set_state(env_rng_states[2])
-    #         agent.set_rng_states(torch_rng_state, random_rng_state)
-    #         print("Keep training from previous run.")
-
-    #     else:
-    #         min_episode = 0
-    #         last_logq_zs = 0
-    #         np.random.seed(params["seed"])
-    #         env.seed(params["seed"])
-    #         env.observation_space.seed(params["seed"])
-    #         env.action_space.seed(params["seed"])
-    #         print("Training from scratch.")
-
-    #     logger.on()
-    #     for episode in tqdm(range(1 + min_episode, params["max_n_episodes"] + 1)):
-    #         z = np.random.choice(params["n_skills"], p=p_z)
-    #         state = env.reset()
-    #         state = concat_state_latent(state, z, params["n_skills"])
-    #         episode_reward = 0
-    #         logq_zses = []
-
-    #         max_n_steps = min(params["max_episode_len"], env.spec.max_episode_steps)
-    #         for step in range(1, 1 + max_n_steps):
-
-    #             action = agent.choose_action(state)
-    #             next_state, reward, done, _ = env.step(action)
-    #             next_state = concat_state_latent(next_state, z, params["n_skills"])
-    #             agent.store(state, z, done, action, next_state)
-    #             logq_zs = agent.train()
-    #             if logq_zs is None:
-    #                 logq_zses.append(last_logq_zs)
-    #             else:
-    #                 logq_zses.append(logq_zs)
-    #             episode_reward += reward
-    #             state = next_state
-    #             if done:
-    #                 break
-
-    #         logger.log(episode,
-    #                    episode_reward,
-    #                    z,
-    #                    sum(logq_zses) / len(logq_zses),
-    #                    step,
-    #                    np.random.get_state(),
-    #                    env.np_random.get_state(),
-    #                    env.observation_space.np_random.get_state(),
-    #                    env.action_space.np_random.get_state(),
-    #                    *agent.get_rng_states(),
-    #                    )
-
-    # else:
-    #     logger.load_weights()
-    #     player = Play(env, agent, n_skills=params["n_skills"])
-    #     player.evaluate()
-
-
 if __name__ == "__main__":
+    # setting
+    configs = get_config()
     # if you want to put the model on GPU and share the params, you should use "spawn"
     # 4 processes will used 9GB memory on GPU
     # 10 processes will used 18.5GB memory on GPU
+    # if configs["forward"] == 'GPU':
+    #     mp.set_start_method('spawn')
     mp.set_start_method('spawn')
     # also you can put the model on CPU, and only use GPU when training
-    main()
+    main(configs)

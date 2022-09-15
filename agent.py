@@ -50,8 +50,8 @@ class SACAgent:
         self.memory = deque(maxlen=self.config["mem_size"])
         self.device = "cuda" if torch.cuda.is_available() else "cpu"
         # self.device = "cpu" 
-
-        torch.manual_seed(self.config["seed"])
+        if self.config["forward"] == "CPU":
+            self.device = "cpu"
         self.policy_network = PolicyNetwork(n_states=self.n_states + self.n_skills,
                                             n_actions=self.config["n_actions"],
                                             action_bounds=self.config["action_bounds"],
@@ -87,7 +87,6 @@ class SACAgent:
     def choose_action(self, states):
         # print(states)
         # print(states.shape)
-        # self.set_policy_net_to_cpu_mode()
         states = np.expand_dims(states, axis=0)
         states = from_numpy(states).float().to(self.device)
         action, _ = self.policy_network.sample_or_likelihood(states)
@@ -121,12 +120,13 @@ class SACAgent:
         if len(self.memory) < self.batch_size:
             return None
         else:
-            # use GPU if available
-            # self.set_policy_net_to_gpu_mode()
-            
+            if torch.cuda.is_available():
+                train_device = self.set_policy_net_to_gpu_mode()
+            else:
+                train_device = "cpu"
             batch = random.sample(self.memory,self.batch_size)
-            states, zs, dones, actions, next_states = self.unpack(batch, self.device)
-            p_z = from_numpy(self.p_z).to(self.device)
+            states, zs, dones, actions, next_states = self.unpack(batch, train_device)
+            p_z = from_numpy(self.p_z).to(train_device)
 
             # Calculating the value target
             reparam_actions, log_probs = self.policy_network.sample_or_likelihood(states)
@@ -177,7 +177,7 @@ class SACAgent:
             self.discriminator_opt.step()
 
             self.soft_update_target_network(self.value_network, self.value_target_network)
-
+            
             return -discriminator_loss.item()
 
     def soft_update_target_network(self, local_network, target_network):
@@ -202,7 +202,19 @@ class SACAgent:
     def set_policy_net_to_cpu_mode(self):
         device = torch.device("cpu")
         self.policy_network.to(device)
+        self.q_value_network1.to(device)
+        self.q_value_network2.to(device)
+        self.value_network.to(device)
+        self.value_target_network.to(device)
+        self.discriminator.to(device)
+        return device
 
     def set_policy_net_to_gpu_mode(self):
         device = torch.device("cuda")
         self.policy_network.to(device)
+        self.q_value_network1.to(device)
+        self.q_value_network2.to(device)
+        self.value_network.to(device)
+        self.value_target_network.to(device)
+        self.discriminator.to(device)
+        return device
