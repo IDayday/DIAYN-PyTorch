@@ -29,7 +29,6 @@ def get_config():
                       "max_n_episodes": 5000,
                       "max_episode_len": 1000,
                       "warmup_size": 1000,
-                      "n_epochs": 50,
                       "gamma": 0.99,
                       "alpha": 0.1,
                       "tau": 0.005,
